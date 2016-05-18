@@ -26,14 +26,6 @@ public class Inventory {
   }
 
   private void updateItem(Item item) {
-    if (item.neverChanges()) {
-      return;
-    }
-    item.setSellIn(item.getSellIn() - 1);
-    if (item.getsBetterWithAge()) {
-      item.increaseQualityIfPossible();
-    } else {
-      item.reduceQualityIfPossible();
-    }
+    Updater.get(item).update(item);
   }
 }
