@@ -5,12 +5,10 @@ public class Inventory {
   private Item[] items;
 
   public Inventory(Item[] items) {
-    super();
     this.items = items;
   }
 
   public Inventory() {
-    super();
     items = new Item[] {
       new Item("+5 Dexterity Vest", 10, 20),
       new Item("Aged Brie", 2, 0),
@@ -18,7 +16,6 @@ public class Inventory {
       new Item("Sulfuras, Hand of Ragnaros", 0, 80),
       new Item("Backstage passes to a TAFKAL80ETC concert", 15, 20),
       new Item("Conjured Mana Cake", 3, 6) };
-
   }
 
   public void updateQuality() {
@@ -29,51 +26,36 @@ public class Inventory {
   }
 
   private void updateItem(Item item) {
-    if (item.getName() != "Aged Brie" && item.getName() != "Backstage passes to a TAFKAL80ETC concert") {
-      if (item.getQuality() > 0) {
-        if (item.getName() != "Sulfuras, Hand of Ragnaros") {
-          item.setQuality(item.getQuality() - 1);
+    if (item.neverChanges()) {
+      return;
+    }
+
+    if (item.getsBetterWithAge()) {
+      item.increaseQualityIfPossible();
+      if (item.getName() == "Backstage passes to a TAFKAL80ETC concert") {
+        if (item.getSellIn() < 11) {
+          item.increaseQualityIfPossible();
+        }
+        if (item.getSellIn() < 6) {
+          item.increaseQualityIfPossible();
         }
       }
     } else {
-      if (item.getQuality() < 50) {
-        item.setQuality(item.getQuality() + 1);
-
-        if (item.getName() == "Backstage passes to a TAFKAL80ETC concert") {
-          if (item.getSellIn() < 11) {
-            if (item.getQuality() < 50) {
-              item.setQuality(item.getQuality() + 1);
-            }
-          }
-
-          if (item.getSellIn() < 6) {
-            if (item.getQuality() < 50) {
-              item.setQuality(item.getQuality() + 1);
-            }
-          }
-        }
-      }
+      item.reduceQualityIfPossible();
     }
 
-    if (item.getName() != "Sulfuras, Hand of Ragnaros") {
-      item.setSellIn(item.getSellIn() - 1);
-    }
+    item.setSellIn(item.getSellIn() - 1);
 
+    // if sellIn is negative, we are out of time
     if (item.getSellIn() < 0) {
-      if (item.getName() != "Aged Brie") {
-        if (item.getName() != "Backstage passes to a TAFKAL80ETC concert") {
-          if (item.getQuality() > 0) {
-            if (item.getName() != "Sulfuras, Hand of Ragnaros") {
-              item.setQuality(item.getQuality() - 1);
-            }
-          }
+      if (item.getsBetterWithAge()) {
+        if (item.uselessWhenOver()) {
+          item.setQuality(0);
         } else {
-          item.setQuality(item.getQuality() - item.getQuality());
+          item.increaseQualityIfPossible();
         }
       } else {
-        if (item.getQuality() < 50) {
-          item.setQuality(item.getQuality() + 1);
-        }
+        item.reduceQualityIfPossible();
       }
     }
   }
