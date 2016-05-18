@@ -38,15 +38,23 @@ public class Item {
   }
 
   public void reduceQualityIfPossible() {
-    if (quality > 0) {
-      quality = quality - 1;
-    }
+    quality = Math.max(quality - 1, 0);
   }
 
   public void increaseQualityIfPossible() {
-    if (quality < 50) {
-      quality = quality + 1;
+    if (!getsBetterWithAge()) {
+      throw new UnsupportedOperationException();
     }
+    int increaseBy = 1;
+    if ("Backstage passes to a TAFKAL80ETC concert".equals(name)) {
+      if (sellIn < 11) {
+        increaseBy++;
+      }
+      if (sellIn < 6) {
+        increaseBy++;
+      }
+    }
+    quality = Math.min(quality + increaseBy, 50);
   }
 
   public boolean uselessWhenOver() {

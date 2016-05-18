@@ -32,14 +32,6 @@ public class Inventory {
 
     if (item.getsBetterWithAge()) {
       item.increaseQualityIfPossible();
-      if (item.getName() == "Backstage passes to a TAFKAL80ETC concert") {
-        if (item.getSellIn() < 11) {
-          item.increaseQualityIfPossible();
-        }
-        if (item.getSellIn() < 6) {
-          item.increaseQualityIfPossible();
-        }
-      }
     } else {
       item.reduceQualityIfPossible();
     }
