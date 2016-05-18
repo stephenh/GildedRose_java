@@ -21,11 +21,7 @@ public class Inventory {
   public void updateQuality() {
     for (int i = 0; i < items.length; i++) {
       Item item = items[i];
-      updateItem(item);
+      Updater.get(item).update(item);
     }
-  }
-
-  private void updateItem(Item item) {
-    Updater.get(item).update(item);
   }
 }
