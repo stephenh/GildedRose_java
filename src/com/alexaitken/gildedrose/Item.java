@@ -7,7 +7,6 @@ public class Item {
 
   private String name;
   private int sellIn;
-
   private int quality;
 
   public Item(String name, int sellIn, int quality) {
@@ -21,8 +20,8 @@ public class Item {
     return name;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public boolean isExpired() {
+    return sellIn <= 0;
   }
 
   public int getSellIn() {
@@ -38,26 +37,31 @@ public class Item {
   }
 
   public void reduceQualityIfPossible() {
-    quality = Math.max(quality - 1, 0);
+    int decrementBy = isExpired() ? 2 : 1;
+    quality = Math.max(quality - decrementBy, 0);
   }
 
   public void increaseQualityIfPossible() {
     if (!getsBetterWithAge()) {
       throw new UnsupportedOperationException();
     }
+    if (isExpired() && uselessWhenOver()) {
+      quality = 0;
+      return;
+    }
     int increaseBy = 1;
     if ("Backstage passes to a TAFKAL80ETC concert".equals(name)) {
-      if (sellIn < 11) {
+      if (sellIn < 10) {
         increaseBy++;
       }
-      if (sellIn < 6) {
+      if (sellIn < 5) {
         increaseBy++;
       }
     }
     quality = Math.min(quality + increaseBy, 50);
   }
 
-  public boolean uselessWhenOver() {
+  private boolean uselessWhenOver() {
     return "Backstage passes to a TAFKAL80ETC concert".equals(name);
   }
 
@@ -67,9 +71,5 @@ public class Item {
 
   public boolean neverChanges() {
     return "Sulfuras, Hand of Ragnaros".equals(name);
-  }
-
-  public void setQuality(int quality) {
-    this.quality = quality;
   }
 }

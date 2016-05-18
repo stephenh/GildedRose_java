@@ -29,26 +29,11 @@ public class Inventory {
     if (item.neverChanges()) {
       return;
     }
-
+    item.setSellIn(item.getSellIn() - 1);
     if (item.getsBetterWithAge()) {
       item.increaseQualityIfPossible();
     } else {
       item.reduceQualityIfPossible();
-    }
-
-    item.setSellIn(item.getSellIn() - 1);
-
-    // if sellIn is negative, we are out of time
-    if (item.getSellIn() < 0) {
-      if (item.getsBetterWithAge()) {
-        if (item.uselessWhenOver()) {
-          item.setQuality(0);
-        } else {
-          item.increaseQualityIfPossible();
-        }
-      } else {
-        item.reduceQualityIfPossible();
-      }
     }
   }
 }
