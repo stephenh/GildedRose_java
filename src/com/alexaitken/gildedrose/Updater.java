@@ -1,7 +1,11 @@
 package com.alexaitken.gildedrose;
 
+/**
+ * Updates the quality of items, with item-specific business rules.
+ */
 public interface Updater {
 
+  /** @return an {@code Updater} for the given {@code item}. */
   public static Updater get(Item item) {
     switch (item.getName()) {
       case "Aged Brie":
@@ -14,15 +18,23 @@ public interface Updater {
     return new DefaultUpdater();
   }
 
+  /** Updates {@code item}'s quality, given that a day has passed. */
   void update(Item item);
 
-  public static abstract class BaseUpdater implements Updater {
-    protected void tickSellIn(Item item) {
+  /** A base updater with some helper methods. */
+  static abstract class BaseUpdater implements Updater {
+    protected void decrementSellIn(Item item) {
       item.setSellIn(item.getSellIn() - 1);
     }
 
-    protected void tickQuality(Item item, int incrementBy) {
-      item.setQuality(Math.max(Math.min(item.getQuality() + incrementBy, 50), 0));
+    /** Updates quality by {@code decrementBy}, but bounded by [0, 50]. */
+    protected void decrementQuality(Item item, int decrementBy) {
+      item.setQuality(Math.max(Math.min(item.getQuality() - decrementBy, 50), 0));
+    }
+
+    /** Updates quality by {@code incrementBy}, but bounded by [0, 50]. */
+    protected void incrementQuality(Item item, int incrementBy) {
+      decrementQuality(item, incrementBy * -1);
     }
   }
 
@@ -36,13 +48,13 @@ public interface Updater {
   public static class TicketUpdater extends BaseUpdater {
     @Override
     public void update(Item item) {
-      tickSellIn(item);
+      decrementSellIn(item);
       if (item.isExpired()) {
         item.setQuality(0);
       } else {
         int sellIn = item.getSellIn();
         int increaseBy = (sellIn < 5) ? 3 : (sellIn < 10) ? 2 : 1;
-        tickQuality(item, increaseBy);
+        incrementQuality(item, increaseBy);
       }
     }
   }
@@ -50,16 +62,16 @@ public interface Updater {
   public static class BrieUpdater extends BaseUpdater {
     @Override
     public void update(Item item) {
-      tickSellIn(item);
-      tickQuality(item, 1);
+      decrementSellIn(item);
+      incrementQuality(item, 1);
     }
   }
 
   public static class DefaultUpdater extends BaseUpdater {
     @Override
     public void update(Item item) {
-      tickSellIn(item);
-      tickQuality(item, item.isExpired() ? -2 : -1);
+      decrementSellIn(item);
+      decrementQuality(item, item.isExpired() ? 2 : 1);
     }
   }
 
